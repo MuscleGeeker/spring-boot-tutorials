@@ -1,6 +1,8 @@
 package me.musclegeeker.demo.configuration;
 
-import org.apache.shiro.mgt.SecurityManager;
+import me.musclegeeker.demo.realm.MyShiroRealm;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
@@ -20,11 +22,11 @@ import java.util.Map;
 public class ShiroConfiguration {
 
     @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
+    public ShiroFilterFactoryBean shiroFilter() {
         System.out.println("ShiroConfiguration.shiroFilter()");
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         /**设置安全管理器**/
-        shiroFilter.setSecurityManager(securityManager);
+        shiroFilter.setSecurityManager(getSecurityManager());
         /**过滤链定义**/
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
         // 退出策略
@@ -42,7 +44,52 @@ public class ShiroConfiguration {
     }
 
     @Bean(name = "securityManager")
-    public SecurityManager getSecurityManager() {
-        return new DefaultWebSecurityManager();
+    public DefaultWebSecurityManager getSecurityManager() {
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        securityManager.setRealm(getRealm());
+        return securityManager;
     }
+
+    /**
+     * 身份认证realm
+     *
+     * @return
+     */
+    @Bean
+    public MyShiroRealm getRealm() {
+        MyShiroRealm shiroRealm = new MyShiroRealm();
+        shiroRealm.setCredentialsMatcher(hashedCredentialsMatcher());
+        return shiroRealm;
+    }
+
+    /**
+     * 凭证匹配器
+     * （由于我们的密码校验交给Shiro的SimpleAuthenticationInfo进行处理了
+     * 所以我们需要修改下doGetAuthenticationInfo中的代码）
+     *
+     * @return
+     */
+    @Bean
+    public HashedCredentialsMatcher hashedCredentialsMatcher() {
+        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+
+        hashedCredentialsMatcher.setHashAlgorithmName("md5");//散列算法:这里使用MD5算法;
+        hashedCredentialsMatcher.setHashIterations(2);//散列的次数，比如散列两次，相当于 md5(md5(""));
+
+        return hashedCredentialsMatcher;
+    }
+
+    /**
+     * 开启shiro aop注解支持.
+     * 使用代理方式;所以需要开启代码支持;
+     *
+     * @return
+     */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor() {
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(getSecurityManager());
+        return authorizationAttributeSourceAdvisor;
+    }
+
 }
