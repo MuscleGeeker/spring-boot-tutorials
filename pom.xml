@@ -10,6 +10,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>srping-boot-shiro-tutorial</module>
+        <module>spring-boot-oauth2.0-tutorial</module>
     </modules>
 
     <properties>
@@ -57,11 +58,6 @@
         </dependency>
 
         <!-- Shiro - Spring -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.shiro</groupId>-->
-            <!--<artifactId>shiro-spring-boot-starter</artifactId>-->
-            <!--<version>1.4.0-RC2</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-spring</artifactId>
