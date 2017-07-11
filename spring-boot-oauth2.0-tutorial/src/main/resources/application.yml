@@ -1,0 +1,10 @@
+OAuth:
+  github:
+    clientId: f7ee635c42de0fe9412c
+    clientSecret: cd7bb9d4ae76086125fb45ff9db47302ee0a9752
+    state: 3B94CCF09D742A2FE8601DA06F96CD49
+demo:
+  host: http://localhost:8080
+spring:
+  thymeleaf:
+    enabled: true
